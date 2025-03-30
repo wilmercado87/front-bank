@@ -1,0 +1,94 @@
+/* You can add global styles to this file, and also import other style files */
+body {
+    font-family: Arial, sans-serif;
+}
+
+.content {
+    margin-left: 270px;
+    padding: 20px;
+}
+
+.table-container {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: #acaeb0
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-custom {
+    background-color: #6c9bd2;
+    border-color: #6c9bd2;
+    color: white;
+}
+
+.btn-custom:hover {
+    background-color: #5a8bc8;
+    border-color: #5a8bc8;
+}
+
+.table-dark {
+    background-color: #acaeb0 !important;
+}
+
+pagination-controls {
+    margin-right: 90px;
+}
+
+/* Ajuste del sidebar en pantallas grandes */
+/* En móviles, la tabla ocupa todo el espacio y se oculta el sidebar fijo */
+@media (max-width: 750px) {
+    .sidebar {
+        display: none;
+    }
+
+    .content {
+        margin-left: 0px;
+        padding: 8px;
+    }
+
+    .table {
+        font-size: 12px; /* Reducir tamaño de fuente en móviles */
+    }
+
+    .table thead {
+        display: none; /* Oculta los encabezados en móviles */
+    }
+
+    .table tbody tr {
+        display: block;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        padding: 10px;
+    }
+
+    .table tbody td {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px;
+    }
+
+    .table tbody td::before {
+        content: attr(data-label); /* Usa atributos personalizados como etiquetas */
+        font-weight: bold;
+        text-transform: capitalize;
+    }
+
+    .row.g-2 .col-12,
+    .row.g-2 .col-6 {
+        width: 100%;
+    }
+
+    body {
+        padding-top: 70px;
+    }
+
+    pagination-controls {
+        margin-left: 140px;
+    }
+}
+

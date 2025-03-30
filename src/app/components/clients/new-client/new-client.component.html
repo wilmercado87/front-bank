@@ -1,0 +1,77 @@
+<!-- New Client Modal -->
+<div class="modal fade" #newClientModal id="newClientModal" tabindex="-1" aria-labelledby="newClientModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background-color: #cce5ff; padding: 20px; border-radius: 8px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newClientModalLabel">{{title()}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModal()"></button>
+            </div>
+            <form [formGroup]="clientForm">
+                <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Shared Key</label>
+                            <input type="text" class="form-control" id="sharedKey" formControlName="sharedKey">
+                            @if (isInvalid('sharedKey') && !clientForm.get('sharedKey')?.errors?.['duplicate']) {
+                                <div class="text-danger">
+                                    Shared Key es obligatorio y debe tener al menos 3 caracteres.
+                                </div>
+                            }
+                            @if (clientForm.get('sharedKey')?.errors?.['duplicate']) {
+                                <div class="text-danger">
+                                    Shared Key ya existe.
+                                </div>
+                            }
+                        </div>
+                        <div class="mb-3">
+                            <label for="businessId" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="businessId" formControlName="businessId">
+                            @if (isInvalid('businessId')) {
+                                <div class="text-danger">
+                                    Nombre es obligatorio.
+                                </div>
+                            }
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="text" class="form-control" id="phone" formControlName="phone">
+                            @if (isInvalid('phone')) {
+                                <div class="text-danger">
+                                    Ingresa un número de teléfono válido (10 dígitos).
+                                </div>
+                            }
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">E-mail</label>
+                            <input type="email" class="form-control" id="email" formControlName="email">
+                            @if (isInvalid('email')) {
+                                <div class="text-danger">
+                                    Ingresa un correo electrónico válido.
+                                </div>
+                            }
+                        </div>
+                        <div class="mb-3">
+                            <label for="startDate" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="startDate" formControlName="startDate">
+                            @if (isInvalid('startDate')) {
+                                <div class="text-danger">
+                                    Fecha inicial es obligatoria.
+                                </div>
+                            }
+                        </div>
+                        <div class="mb-3">
+                            <label for="endDate" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="endDate" formControlName="endDate">
+                            @if (isInvalid('endDate')) {
+                                <div class="text-danger">
+                                    Fecha final es obligatoria.
+                                </div>
+                            }
+                        </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-custom" (click)="validateForm()" [disabled]="clientForm.invalid">OK</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

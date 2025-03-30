@@ -1,0 +1,42 @@
+<!-- Advanced search Modal -->
+<div class="modal fade" #advancedSearchModal id="advancedSearchModal" tabindex="-1" aria-labelledby="advancedSearchModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="background-color: #cce5ff; padding: 20px; border-radius: 8px;">
+            <div class="modal-header">
+                <h5 class="modal-title" id="advancedSearchModalLabel">{{title}}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="closeModal()"></button>
+            </div>
+            <form [formGroup]="searchForm">
+                <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="field" class="form-label">Field</label>
+                            <select class="form-control" id="field" formControlName="field">
+                                <option value="" disabled selected>Select a field</option>
+                                <option value="businessId">Business ID</option>
+                                <option value="email">E-mail</option>
+                                <option value="phone">Phone</option>
+                            </select>
+                            @if (isInvalid('field')) {
+                                <div class="text-danger">
+                                    Field is required.
+                                </div>
+                            }
+                        </div>
+                        <div class="mb-3">
+                            <label for="value" class="form-label">Value</label>
+                            <input type="text" class="form-control" id="value" formControlName="value">
+                            @if (isInvalid('value')) {
+                                <div class="text-danger">
+                                    Value is required.
+                                </div>
+                            }
+                        </div>
+                        
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-custom" (click)="validateForm()" [disabled]="searchForm.invalid">Seach</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
