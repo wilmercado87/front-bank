@@ -138,6 +138,6 @@ npx jest ${file}.spec.ts
 ```
 Ver reporte de cobertura
 - npx http-server coverage/lcov-report
-- Aceso: http://localhost:8081
+- Acceso: http://localhost:8081
 ```
 ---
