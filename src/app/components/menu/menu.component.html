@@ -2,9 +2,9 @@
     
     <img src="logo.png" alt="Alianza Logo" class="img-fluid">
     
-    <a routerLink="/">
-        Clientes
-    </a>
+    <a routerLink="/">Home</a>
+    <a [routerLink]="[{ outlets: { main: ['clients'] } }]">Clientes</a>
+
     <a >Client look history</a>
     <a >Emergency PIN configuration</a>
     <a >Emergency PIN history</a>
@@ -25,7 +25,8 @@
     <div class="offcanvas-body">
         <img src="logo.png" alt="Alianza Logo" class="img-fluid logo">
         <nav class="nav flex-column mt-3">
-            <a class="nav-link" routerLink="/clients">Clientes</a>
+            <a class="nav-link" routerLink="/" data-bs-dismiss="offcanvas">Home</a>
+            <a class="nav-link" [routerLink]="[{ outlets: { main: ['clients'] } }]" data-bs-dismiss="offcanvas">Clientes</a>
             <a class="nav-link">Client look history</a>
             <a class="nav-link">Emergency PIN configuration</a>
             <a class="nav-link">Emergency PIN history</a>

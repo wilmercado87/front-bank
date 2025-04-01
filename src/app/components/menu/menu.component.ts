@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-menu',
@@ -9,5 +9,5 @@ import { Router, RouterLink } from '@angular/router';
 })
 export class MenuComponent {
 
-  constructor(private router: Router) {}
+  constructor() {}
 }

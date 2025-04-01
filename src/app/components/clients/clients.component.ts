@@ -1,5 +1,4 @@
 import { Component, inject, OnInit, WritableSignal, signal, ViewChild, ElementRef, computed } from '@angular/core';
-import { MenuComponent } from "../menu/menu.component";
 import { CommonModule } from '@angular/common';
 import { NewClientComponent } from './new-client/new-client.component';
 import { Client } from '../../models/client';
@@ -12,7 +11,7 @@ import { Utility } from '../../utils/utility';
 
 @Component({
   selector: 'app-clients',
-  imports: [MenuComponent, CommonModule, NgxPaginationModule, NewClientComponent, AdvancedSearchComponent],
+  imports: [CommonModule, NgxPaginationModule, NewClientComponent, AdvancedSearchComponent],
   providers: [Papa],
   templateUrl: './clients.component.html',
   styleUrl: './clients.component.scss'
