@@ -14,11 +14,11 @@ export class NewClientComponent implements AfterViewInit {
 
   clientForm!: FormGroup;
 
-  @Input() title!: Signal<string>; 
+  @Input() title = '';
   newClient = output<Client>();
   updateClient = output<Client>();
   @ViewChild('newClientModal') modalElement!: ElementRef;
-  private modalInstance!: Modal;
+  modalInstance!: Modal;
   isNewClient: boolean = true;
 
   constructor(private fb: FormBuilder) {

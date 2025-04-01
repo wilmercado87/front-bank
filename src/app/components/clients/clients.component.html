@@ -94,7 +94,7 @@
         </div>
     </div>
 
-    <app-new-client #newClient [title]="dynamicTitle" (newClient)="handleNewClient($event)" (updateClient)="handleUpdateClient($event)"/>
+    <app-new-client #newClient [title]="dynamicTitle()" (newClient)="handleNewClient($event)" (updateClient)="handleUpdateClient($event)"/>
     <app-advanced-search #advancedSearch title="Advanced Search" (data)="handleData($event)"/>
     
 </div>

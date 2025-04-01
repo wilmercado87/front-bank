@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing';
 import { NewClientComponent } from './new-client.component';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { ComponentFixture } from '@angular/core/testing';
-import { Client } from '../../../models/client';
 
 describe('NewClientComponent', () => {
   let component: NewClientComponent;

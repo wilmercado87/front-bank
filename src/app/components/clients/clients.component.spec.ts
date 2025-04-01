@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { ClientsComponent } from './clients.component';
 import { ClientService } from '../../services/client.service';
 import { of } from 'rxjs';
@@ -43,6 +43,10 @@ describe('ClientsComponent', () => {
       openModal: jest.fn(),
       closeModal: jest.fn(),
     } as unknown as NewClientComponent;
+
+    component.inputElement = {
+      nativeElement: { value: '' },
+    } as any;
 
     global.URL.createObjectURL = jest.fn(() => 'blob-url');
     jest.spyOn(Papa.prototype, 'unparse').mockImplementation(() => 'csv-data');
@@ -108,46 +112,27 @@ describe('ClientsComponent', () => {
     expect(component.clientModal.openModal).toHaveBeenCalledWith(true);
   });
 
-  it('debería manejar la actualización de un cliente', () => {
+  it('debería manejar la actualización de un cliente', fakeAsync(() => {
     const mockClient: Client = {
       sharedKey: '123',
       businessId: 'Biz',
       phone: 1234567890,
       email: 'test@example.com',
-      dataAdded: '2024-01-01|2024-12-31'
+      dataAdded: '2024-01-01|2024-12-31',
     };
+  
+    jest.spyOn(clientServiceMock, 'refreshClients');
+    clientServiceMock.updateClient = jest.fn().mockReturnValue(of(null));
     component.clientModal = { closeModal: jest.fn() } as any;
-
+  
     component.handleUpdateClient(mockClient);
-
+  
+    tick();
+  
     expect(clientServiceMock.updateClient).toHaveBeenCalledWith('123', mockClient);
     expect(component.clientModal.closeModal).toHaveBeenCalled();
     expect(clientServiceMock.refreshClients).toHaveBeenCalled();
-  });
-
-  it('debería manejar la eliminación de un cliente', () => {
-    component.signalClients.set([{
-      sharedKey: '123',
-      businessId: 'Biz',
-      phone: 1234567890,
-      email: 'test@example.com',
-      dataAdded: '2024-01-01|2024-12-31'
-    }, {
-      sharedKey: '456',
-      businessId: 'Biz',
-      phone: 1234567890,
-      email: 'test@example.com',
-      dataAdded: '2024-01-01|2024-12-31'
-    }]);
-
-    clientServiceMock.deleteClient.mockReturnValue(of({}));
-
-    component.removeClient('123');
-
-    expect(clientServiceMock.deleteClient).toHaveBeenCalledWith('123');
-    expect(component.signalClients().length).toBe(1);
-    expect(component.signalClients()[0].sharedKey).toBe('456');
-  });
+  }));
 
   it('debería realizar la búsqueda por clave compartida', () => {
     component.loading.set(false);

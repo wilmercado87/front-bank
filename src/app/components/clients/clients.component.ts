@@ -28,7 +28,7 @@ export class ClientsComponent implements OnInit {
   page = signal(1);
   papa = inject(Papa);
 
-  dynamicTitle = signal('');
+  dynamicTitle: WritableSignal<string> = signal('');
 
   ngOnInit(): void {
     this.loadClients();
@@ -42,6 +42,7 @@ export class ClientsComponent implements OnInit {
 
   openClientModal(title: string, client?: Client) {
     this.dynamicTitle.set(title);
+    this.clientModal.title = title;
     this.clientModal.clientForm.get('sharedKey')?.enable();
     let isNewClient = true;
     if (client) {
