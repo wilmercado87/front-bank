@@ -1,4 +1,4 @@
-import { Component, OnInit, WritableSignal, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, WritableSignal, inject, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Client } from '../../models/client';
 import { ClientService } from '../../services/client.service';
@@ -16,7 +16,7 @@ import { AdvancedSearchComponent } from '../advanced-search/advanced-search.comp
   templateUrl: './clients.component.html',
   styleUrl: './clients.component.scss'
 })
-export class ClientsComponent implements OnInit {
+export class ClientsComponent implements OnInit, OnDestroy {
   columns = Utility.columns;
   clientService = signal(inject(ClientService));
   papa = inject(Papa);
@@ -109,30 +109,30 @@ export class ClientsComponent implements OnInit {
   insertClient(formData: any) {
     const client = this.formatClient(formData);
 
-    this.clientService().createClient(client).subscribe((newClient) => {
-      const clients = [...this.signalClients(), newClient];
+    //this.clientService().createClient(client).subscribe((newClient) => { /** Habilitar para persistir * */
+      const clients = [...this.signalClients(), client];
       this.updateStateAndStorage(clients);
       this.dialogRef.close();
-    });
+    //});
   }
 
   updateClient(formData: any) {
     const updatedClient = this.formatClient(formData, true);
 
-    this.clientService().updateClient(updatedClient).subscribe(() => {
+    //this.clientService().updateClient(updatedClient).subscribe(() => { /** Habilitar para persistir * */
       const clients = this.signalClients().map(c =>
         c.id === updatedClient.id ? { ...updatedClient } : c
       );
       this.updateStateAndStorage(clients);
       this.dialogRef.close();
-    });
+    //});
   }
 
   removeClient(id: string) {
-    this.clientService().deleteClient(id).subscribe(() => {
+    //this.clientService().deleteClient(id).subscribe(() => { /** Habilitar para persistir * */
       const clients = this.signalClients().filter(c => c.id !== id);
       this.updateStateAndStorage(clients);
-    });
+    //});
   }
 
   handleData(data: any) {
@@ -174,6 +174,10 @@ export class ClientsComponent implements OnInit {
 
   trackByClient(index: number, client: Client) {
     return client.id;
+  }
+
+  ngOnDestroy() {
+    localStorage.removeItem('clients');
   }
 }
 
