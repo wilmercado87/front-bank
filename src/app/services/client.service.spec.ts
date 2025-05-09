@@ -1,20 +1,15 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ClientService } from './client.service';
-import { Client } from '../models/client';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
 import { environment } from '../../environments/environment';
+import { Client } from '../models/client';
 
 describe('ClientService', () => {
   let service: ClientService;
   let httpMock: HttpTestingController;
-
-  const mockClient: Client = {
-    id: '123',
-    name: 'Biz',
-    email: 'test@example.com',
-    phone: 1234567890,
-    dataDates: '2024-01-01|2024-12-31',
-  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -24,65 +19,88 @@ describe('ClientService', () => {
 
     service = TestBed.inject(ClientService);
     httpMock = TestBed.inject(HttpTestingController);
-
-    jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    httpMock.verify();
+    httpMock.verify(); // Verifica que no haya solicitudes pendientes
   });
 
-  it('debería obtener la lista de clientes', () => {
+  it('debería obtener clientes', (done) => {
+    const mockClients: Client[] = [
+      {
+        id: '1',
+        document: '123',
+        name: 'Juan',
+        phone: '123456789',
+        email: 'juan@example.com',
+        dataDates: '2025-01-01 2025-12-31',
+      },
+    ];
+
     service.getClients().subscribe((clients) => {
-      expect(clients.length).toBe(1);
-      expect(clients).toEqual([mockClient]);
+      expect(clients).toEqual(mockClients);
+      done();
     });
 
-    const req = httpMock.expectOne(environment.apiUrl);
+    const req = httpMock.expectOne(`https://${environment.host}/api/v1`);
     expect(req.request.method).toBe('GET');
-    req.flush([mockClient]);
+    req.flush(mockClients);
   });
 
-  it('debería obtener un cliente por ID', () => {
-    service.getClientById(mockClient.id).subscribe((client) => {
-      expect(client).toEqual(mockClient);
+  it('debería crear un cliente', (done) => {
+    const newClient: Client = {
+      id: '2',
+      document: '456',
+      name: 'María',
+      phone: '987654321',
+      email: 'maria@example.com',
+      dataDates: '2025-02-01 2025-11-30',
+    };
+
+    service.createClient(newClient).subscribe((client) => {
+      expect(client).toEqual(newClient);
+      done();
     });
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/${mockClient.id}`);
-    expect(req.request.method).toBe('GET');
-    req.flush(mockClient);
-  });
-
-  it('debería crear un nuevo cliente', () => {
-    service.createClient(mockClient).subscribe((client) => {
-      expect(client).toEqual(mockClient);
-    });
-
-    const req = httpMock.expectOne(environment.apiUrl);
+    const req = httpMock.expectOne(`https://${environment.host}/api/v1`);
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual(mockClient);
-    req.flush(mockClient);
+    expect(req.request.body).toEqual(newClient);
+    req.flush(newClient);
   });
 
-  it('debería actualizar un cliente existente', () => {
-    service.updateClient(mockClient.id, mockClient).subscribe((client) => {
-      expect(client).toEqual(mockClient);
+  it('debería actualizar un cliente', (done) => {
+    const updatedClient: Client = {
+      id: '1',
+      document: '123',
+      name: 'Juan Pérez',
+      phone: '123456789',
+      email: 'juanp@example.com',
+      dataDates: '2025-01-01 2025-12-31',
+    };
+
+    service.updateClient(updatedClient).subscribe((client) => {
+      expect(client).toEqual(updatedClient);
+      done();
     });
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/${mockClient.id}`);
-    expect(req.request.method).toBe('PUT');
-    expect(req.request.body).toEqual(mockClient);
-    req.flush(mockClient);
+    const req = httpMock.expectOne(
+      `https://${environment.host}/api/v1/${updatedClient.id}`
+    );
+    expect(req.request.method).toBe('PATCH');
+    expect(req.request.body).toEqual(updatedClient);
+    req.flush(updatedClient);
   });
 
-  it('debería eliminar un cliente', () => {
-    service.deleteClient(mockClient.id).subscribe((response) => {
-      expect(response).toBeUndefined();
-    });
+  it('debería eliminar un cliente', async () => {
+    const clientId = '1';
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/${mockClient.id}`);
+    const deleteClientPromise = service.deleteClient(clientId).toPromise();
+
+    const req = httpMock.expectOne(`https://${environment.host}/api/v1/${clientId}`);
     expect(req.request.method).toBe('DELETE');
     req.flush(null);
+
+    const response = await deleteClientPromise;
+    expect(response).toBeNull();
   });
-  
 });

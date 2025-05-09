@@ -1,6 +1,6 @@
-# 🚀 Frontend Angular 19 - Cliente bank
+# 🚀 Frontend Angular 19 - Cliente Bank
 
-La aplicación Client bank en Angular 19, se puede ejecutarse en **modo desarrollo** o **modo producción con Docker**.
+La aplicación Client Bank en Angular 19, se puede ejecutarse en **modo desarrollo** o **modo producción con Docker**.
 
 ## 📌 Requisitos Previos
 
@@ -53,7 +53,7 @@ docker build -t front-bank .
 ```sh
 docker run -p 4200:4200 front-bank
 ```
-Esto expondrá la aplicación en 👉 **http://127.0.0.1:4200/index.html**
+Esto expondrá la aplicación en 👉 **http://localhost:4200/index.html**
 
 ---
 

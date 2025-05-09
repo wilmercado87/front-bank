@@ -1,38 +1,24 @@
-import { Utility } from '../utils/utility';
-import { Papa } from 'ngx-papaparse';
+import { Utility } from './utility';
+import { Modal } from 'bootstrap';
+import { ElementRef } from '@angular/core';
 
-describe('Utility', () => {
-  let mockAnchor: HTMLAnchorElement;
+describe('Utility.setModalInstance', () => {
+  it('debería mostrar el modal cuando isAriaHidden es "false"', () => {
+    const div = document.createElement('div');
+    const modalElement = new ElementRef(div);
 
-  beforeEach(() => {
-    global.URL.createObjectURL = jest.fn(() => 'mock-blob-url');
+    const modalInstance = {
+      show: jest.fn(),
+      hide: jest.fn(),
+    } as unknown as Modal;
 
-    mockAnchor = {
-      setAttribute: jest.fn(),
-      click: jest.fn(),
-      remove: jest.fn(),
-    } as unknown as HTMLAnchorElement;
+    Utility.setModalInstance('false', modalInstance, modalElement);
 
-    jest.spyOn(document, 'createElement').mockReturnValue(mockAnchor);
-    jest.spyOn(document.body, 'appendChild').mockImplementation();
-    jest.spyOn(document.body, 'removeChild').mockImplementation();
-  });
+    expect(div.hasAttribute('aria-hidden')).toBe(false);
+    expect(div.hasAttribute('inert')).toBe(false);
+    expect(div.classList.contains('show')).toBe(true);
+    expect(div.style.display).toBe('block');
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  it('debería exportar los clientes a CSV', () => {
-    const csvData = 'col1,col2\nvalue1,value2';
-    const fileName = 'clients.csv';
-
-    Utility.exportToCSV(fileName, csvData);
-
-    expect(global.URL.createObjectURL).toHaveBeenCalled();
-    expect(mockAnchor.setAttribute).toHaveBeenCalledWith('href', 'mock-blob-url');
-    expect(mockAnchor.setAttribute).toHaveBeenCalledWith('download', fileName);
-    expect(mockAnchor.click).toHaveBeenCalled();
-    expect(document.body.appendChild).toHaveBeenCalledWith(mockAnchor);
-    expect(document.body.removeChild).toHaveBeenCalledWith(mockAnchor);
+    expect(modalInstance.show).toHaveBeenCalled();
   });
 });

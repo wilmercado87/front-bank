@@ -37,7 +37,7 @@ describe('AdvancedSearchComponent', () => {
 
   it('debería marcar el formulario como válido si los campos están llenos', () => {
     component.searchForm.controls['field'].setValue('Nombre');
-    component.searchForm.controls['value'].setValue('John Doe');
+    component.searchForm.controls['value'].setValue('William');
     expect(component.searchForm.valid).toBe(true);
   });
 

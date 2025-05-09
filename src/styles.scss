@@ -1,5 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
+/* src/styles.css o src/styles.scss */
 @use 'variables' as *;
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
 
 body {
     font-family: Arial, sans-serif;
@@ -8,6 +10,12 @@ body {
 .content {
     margin-left: 270px;
     padding: 20px;
+}
+
+.modal-content-info {
+    background-color: $color-blue-light-secondary; 
+    padding: 20px; 
+    border-radius: 8px;
 }
 
 .table-container {

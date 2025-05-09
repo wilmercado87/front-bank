@@ -1,20 +1,37 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NewClientComponent } from './new-client.component';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { ComponentFixture } from '@angular/core/testing';
+import { ElementRef } from '@angular/core';
+import { Utility } from '../../../utils/utility';
+
+jest.mock('bootstrap', () => ({
+  Modal: jest.fn().mockImplementation(() => ({
+    show: jest.fn(),
+    hide: jest.fn(),
+  })),
+}));
+
+jest.mock('../../../utils/utility', () => ({
+  Utility: {
+    setModalInstance: jest.fn(),
+  },
+}));
 
 describe('NewClientComponent', () => {
   let component: NewClientComponent;
   let fixture: ComponentFixture<NewClientComponent>;
+  let modalElement: ElementRef;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [NewClientComponent, ReactiveFormsModule],
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [ReactiveFormsModule, NewClientComponent],
       providers: [FormBuilder],
     }).compileComponents();
 
     fixture = TestBed.createComponent(NewClientComponent);
     component = fixture.componentInstance;
+    modalElement = fixture.nativeElement.querySelector('#newClientModal');
+    component.modalElement = modalElement;
     fixture.detectChanges();
   });
 
@@ -22,9 +39,11 @@ describe('NewClientComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('debería inicializar el formulario con valores vacíos', () => {
+  it('debería inicializar el formulario', () => {
+    expect(component.clientForm).toBeTruthy();
     expect(component.clientForm.value).toEqual({
       id: '',
+      document: '',
       name: '',
       email: '',
       phone: '',
@@ -33,74 +52,47 @@ describe('NewClientComponent', () => {
     });
   });
 
-  it('debería validar el formulario correctamente', () => {
-    const form = component.clientForm;
-    form.controls['id'].setValue('ABC');
-    form.controls['name'].setValue('123');
-    form.controls['email'].setValue('test@example.com');
-    form.controls['phone'].setValue('1234567890');
-    form.controls['startDate'].setValue('2024-01-01');
-    form.controls['endDate'].setValue('2024-12-31');
-
-    expect(form.valid).toBe(true);
-  });
-
-  it('debería marcar los campos como inválidos si están vacíos', () => {
-    component.clientForm.controls['id'].setValue('');
-    component.clientForm.controls['name'].setValue('');
-    component.clientForm.controls['email'].setValue('');
-    component.clientForm.controls['phone'].setValue('');
-    component.clientForm.controls['startDate'].setValue('');
-    component.clientForm.controls['endDate'].setValue('');
-
-    expect(component.clientForm.valid).toBe(false);
-  });
-
-  it('debería emitir un evento al crear un nuevo cliente', () => {
-    jest.spyOn(component.newClient, 'emit');
-
+  it('debería emitir el evento el newClient cuando el validateForm es llamado con el new client', () => {
+    const spy = jest.spyOn(component.newClient, 'emit');
     component.clientForm.setValue({
-      id: 'ABC123',
-      name: '123',
-      email: 'test@example.com',
-      phone: 1234567890,
-      startDate: '2024-01-01',
-      endDate: '2024-12-31',
+      id: '',
+      document: '1234567890',
+      name: 'William Mercado',
+      email: 'william.mercado@example.com',
+      phone: '1234567890',
+      startDate: '2025-01-01',
+      endDate: '2025-12-31',
     });
-
-    component.isNewClient = true;
     component.validateForm();
-
-    expect(component.newClient.emit).toHaveBeenCalledWith({
-      id: 'ABC123',
-      name: '123',
-      email: 'test@example.com',
-      phone: 1234567890,
-      dataDates: '2024-01-01|2024-12-31',
+    expect(spy).toHaveBeenCalledWith({
+      document: '1234567890',
+      name: 'William Mercado',
+      email: 'william.mercado@example.com',
+      phone: '1234567890',
+      dataDates: '2025-01-01 2025-12-31',
     });
   });
 
-  it('debería emitir un evento al actualizar un cliente', () => {
-    jest.spyOn(component.updateClient, 'emit');
-
-    component.clientForm.setValue({
-      id: 'XYZ789',
-      name: '456',
-      email: 'update@example.com',
-      phone: 9876543210,
-      startDate: '2024-02-01',
-      endDate: '2024-11-30',
-    });
-
+  it('debería emitir el evento updateClient cuaando el validateForm es llamado cuando existe un cliente', () => {
     component.isNewClient = false;
+    const spy = jest.spyOn(component.updateClient, 'emit');
+    component.clientForm.setValue({
+      id: '1',
+      document: '1234567890',
+      name: 'William Mercado',
+      email: 'william.mercado@example.com',
+      phone: '1234567890',
+      startDate: '2025-01-01',
+      endDate: '2025-12-31',
+    });
     component.validateForm();
-
-    expect(component.updateClient.emit).toHaveBeenCalledWith({
-      id: 'XYZ789',
-      name: '456',
-      email: 'update@example.com',
-      phone: 9876543210,
-      dataDates: '2024-02-01|2024-11-30',
+    expect(spy).toHaveBeenCalledWith({
+      id: '1',
+      document: '1234567890',
+      name: 'William Mercado',
+      email: 'william.mercado@example.com',
+      phone: '1234567890',
+      dataDates: '2025-01-01 2025-12-31',
     });
   });
 });

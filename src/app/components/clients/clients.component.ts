@@ -24,7 +24,6 @@ export class ClientsComponent implements OnInit {
   papa = inject(Papa);
 
   signalClients: WritableSignal<Client[]> = signal<Client[]>([]);
-  id = signal<string>('');
   loading = signal<boolean>(false);
   page = signal(1);
 
@@ -107,6 +106,7 @@ export class ClientsComponent implements OnInit {
   removeClient(id: string) {
     this.clientService.deleteClient(id).subscribe(() => {
       this.signalClients.update(() => this.signalClients().filter(c => c.id !== id));
+      this.refreshClients();
     });
   }
 
