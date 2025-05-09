@@ -1,7 +1,8 @@
 export interface Client {
-    sharedKey: string;
-    businessId: string;
+    id?: string;
+    document: string;
+    name: string;
     email: string;
-    phone: number;
-    dataAdded: string;
+    phone: string;
+    dataDates: string;
 }

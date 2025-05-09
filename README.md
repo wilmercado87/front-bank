@@ -1,6 +1,6 @@
-# 🚀 Frontend Angular 19 - Cliente Alianza
+# 🚀 Frontend Angular 19 - Cliente bank
 
-La aplicación Cliente Alianza en Angular 19, se puede ejecutarse en **modo desarrollo** o **modo producción con Docker**.
+La aplicación Client bank en Angular 19, se puede ejecutarse en **modo desarrollo** o **modo producción con Docker**.
 
 ## 📌 Requisitos Previos
 
@@ -14,8 +14,8 @@ Antes de ejecutar, asegúrate de tener instalados los siguientes programas:
 
 ## 🛠 Clonar el repositorio
 ```
-git clone https://github.com/wilmercado87/front-alianza.git
-cd front-alianza
+git clone https://github.com/wilmercado87/front-bank.git
+cd front-bank
 ```
 
 ## 🛠 Opción 1: Modo Local (Desarrollo)
@@ -29,31 +29,29 @@ Nota: Para el ambiente desarrollo, el item apiUrl del archivo enviroment.ts debe
 
 ### 📌 2️⃣ Ejecutar la aplicación en modo desarrollo
 ```sh
-ng serve --configuration=development --proxy-config proxy.conf.json
+ng serve --configuration=development
 ```
 Por defecto, la aplicación se ejecutará en:  
 👉 **http://localhost:4200**
 
 📌 **Si necesitas cambiar el puerto**, usa:
 ```sh
-ng serve --configuration=development --proxy-config proxy.conf.json --port=4300
+ng serve --configuration=development --port=4300
 ```
 
 ---
 
 ## 🚀 Opción 2: Modo Producción con Docker
 
-Nota: Para el ambiente docker, el item apiUrl del archivo enviroment.ts debe contener 'http://localhost:8080/api/clients'
-
 
 ### 📌 1 Construir la imagen Docker
 ```sh
-docker build -t front-alianza .
+docker build -t front-bank .
 ```
 
 ### 📌 2 Ejecutar el contenedor
 ```sh
-docker run -p 4200:4200 front-alianza
+docker run -p 4200:4200 front-bank
 ```
 Esto expondrá la aplicación en 👉 **http://127.0.0.1:4200/index.html**
 
@@ -93,7 +91,7 @@ WORKDIR /app
 RUN npm install -g http-server
 
 # Copiar los archivos de build desde la etapa anterior
-COPY --from=build /app/dist/front-alianza/browser /app/dist
+COPY --from=build /app/dist/front-bank/browser /app/dist
 
 # Exponer el puerto en el que se servirá la aplicación
 EXPOSE 4200
@@ -113,7 +111,7 @@ Si prefieres usar `docker-compose`, puedes crear un archivo `docker-compose.yml`
 version: "3"
 services:
   frontend:
-    image: front-alianza
+    image: front-bank
     build: .
     ports:
       - "4200:4200"

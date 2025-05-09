@@ -24,8 +24,8 @@ describe('NewClientComponent', () => {
 
   it('debería inicializar el formulario con valores vacíos', () => {
     expect(component.clientForm.value).toEqual({
-      sharedKey: '',
-      businessId: '',
+      id: '',
+      name: '',
       email: '',
       phone: '',
       startDate: '',
@@ -35,8 +35,8 @@ describe('NewClientComponent', () => {
 
   it('debería validar el formulario correctamente', () => {
     const form = component.clientForm;
-    form.controls['sharedKey'].setValue('ABC');
-    form.controls['businessId'].setValue('123');
+    form.controls['id'].setValue('ABC');
+    form.controls['name'].setValue('123');
     form.controls['email'].setValue('test@example.com');
     form.controls['phone'].setValue('1234567890');
     form.controls['startDate'].setValue('2024-01-01');
@@ -46,8 +46,8 @@ describe('NewClientComponent', () => {
   });
 
   it('debería marcar los campos como inválidos si están vacíos', () => {
-    component.clientForm.controls['sharedKey'].setValue('');
-    component.clientForm.controls['businessId'].setValue('');
+    component.clientForm.controls['id'].setValue('');
+    component.clientForm.controls['name'].setValue('');
     component.clientForm.controls['email'].setValue('');
     component.clientForm.controls['phone'].setValue('');
     component.clientForm.controls['startDate'].setValue('');
@@ -60,8 +60,8 @@ describe('NewClientComponent', () => {
     jest.spyOn(component.newClient, 'emit');
 
     component.clientForm.setValue({
-      sharedKey: 'ABC123',
-      businessId: '123',
+      id: 'ABC123',
+      name: '123',
       email: 'test@example.com',
       phone: 1234567890,
       startDate: '2024-01-01',
@@ -72,11 +72,11 @@ describe('NewClientComponent', () => {
     component.validateForm();
 
     expect(component.newClient.emit).toHaveBeenCalledWith({
-      sharedKey: 'ABC123',
-      businessId: '123',
+      id: 'ABC123',
+      name: '123',
       email: 'test@example.com',
       phone: 1234567890,
-      dataAdded: '2024-01-01|2024-12-31',
+      dataDates: '2024-01-01|2024-12-31',
     });
   });
 
@@ -84,8 +84,8 @@ describe('NewClientComponent', () => {
     jest.spyOn(component.updateClient, 'emit');
 
     component.clientForm.setValue({
-      sharedKey: 'XYZ789',
-      businessId: '456',
+      id: 'XYZ789',
+      name: '456',
       email: 'update@example.com',
       phone: 9876543210,
       startDate: '2024-02-01',
@@ -96,11 +96,11 @@ describe('NewClientComponent', () => {
     component.validateForm();
 
     expect(component.updateClient.emit).toHaveBeenCalledWith({
-      sharedKey: 'XYZ789',
-      businessId: '456',
+      id: 'XYZ789',
+      name: '456',
       email: 'update@example.com',
       phone: 9876543210,
-      dataAdded: '2024-02-01|2024-11-30',
+      dataDates: '2024-02-01|2024-11-30',
     });
   });
 });

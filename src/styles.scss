@@ -1,4 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
+@use 'variables' as *;
+
 body {
     font-family: Arial, sans-serif;
 }
@@ -9,10 +11,10 @@ body {
 }
 
 .table-container {
-    background: white;
+    background: $color-background;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: #acaeb0
+    box-shadow: $color-gray-light 0px 0px 10px;
 }
 
 .header-buttons {
@@ -21,26 +23,20 @@ body {
 }
 
 .btn-custom {
-    background-color: #6c9bd2;
-    border-color: #6c9bd2;
-    color: white;
+    background-color: $color-blue-light;
+    border-color: $color-secondary;
+    color: $color-background;
 }
 
 .btn-custom:hover {
-    background-color: #5a8bc8;
-    border-color: #5a8bc8;
-}
-
-.table-dark {
-    background-color: #acaeb0 !important;
+    background-color: $color-blue-light;
+    border-color: $color-secondary;
 }
 
 pagination-controls {
     margin-right: 90px;
 }
 
-/* Ajuste del sidebar en pantallas grandes */
-/* En móviles, la tabla ocupa todo el espacio y se oculta el sidebar fijo */
 @media (max-width: 750px) {
     .sidebar {
         display: none;
@@ -52,17 +48,17 @@ pagination-controls {
     }
 
     .table {
-        font-size: 12px; /* Reducir tamaño de fuente en móviles */
+        font-size: 12px;
     }
 
     .table thead {
-        display: none; /* Oculta los encabezados en móviles */
+        display: none;
     }
 
     .table tbody tr {
         display: block;
         margin-bottom: 15px;
-        border: 1px solid #ddd;
+        border: 1px solid $color-gray-light;
         padding: 10px;
     }
 
@@ -73,7 +69,7 @@ pagination-controls {
     }
 
     .table tbody td::before {
-        content: attr(data-label); /* Usa atributos personalizados como etiquetas */
+        content: attr(data-label);
         font-weight: bold;
         text-transform: capitalize;
     }

@@ -1,19 +1,15 @@
 <div class="sidebar">
-    
-    <img src="logo.png" alt="Alianza Logo" class="img-fluid">
-    
+    <div>
+        <h1>BANK OF CLIENTS</h1>
+    </div>
     <a routerLink="/">Home</a>
-    <a [routerLink]="[{ outlets: { main: ['clients'] } }]">Clientes</a>
-
-    <a >Client look history</a>
-    <a >Emergency PIN configuration</a>
-    <a >Emergency PIN history</a>
+    <a [routerLink]="[{ outlets: { main: ['clients'] } }]">Clients</a>
 </div>
 
 <!-- Botón para abrir el menú en móviles -->
-<div class="d-md-none text-center fixed-top bg-light p-2 shadow">
+<div class="d-md-none text-center bg-light p-2 shadow menu">
     <button class="btn btn-primary w-100" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
-        ☰ Menu
+        <i class="bi bi-list"></i> Menu
     </button>
 </div>
 
@@ -23,13 +19,10 @@
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body">
-        <img src="logo.png" alt="Alianza Logo" class="img-fluid logo">
+        <h2>BANK OF CLIENTS</h2>
         <nav class="nav flex-column mt-3">
             <a class="nav-link" routerLink="/" data-bs-dismiss="offcanvas">Home</a>
             <a class="nav-link" [routerLink]="[{ outlets: { main: ['clients'] } }]" data-bs-dismiss="offcanvas">Clientes</a>
-            <a class="nav-link">Client look history</a>
-            <a class="nav-link">Emergency PIN configuration</a>
-            <a class="nav-link">Emergency PIN history</a>
         </nav>
     </div>
 </div>

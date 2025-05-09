@@ -1,19 +1,13 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, switchMap, catchError, of } from 'rxjs';
 import { Client } from '../models/client';
 import { environment } from '../../environments/environment';
 
-const headers = (user: string, password: string) =>
-  new HttpHeaders({
-    Authorization: 'Basic ' + btoa(user + ':' + password),
-  });
-
 @Injectable({
   providedIn: 'root',
 })
 export class ClientService {
-  private apiUrl = environment.apiUrl;
   private refreshTrigger = new BehaviorSubject<void>(null as any);
   http = inject(HttpClient);
 
@@ -22,9 +16,7 @@ export class ClientService {
   getClients(): Observable<Client[]> {
     return this.refreshTrigger.pipe(
       switchMap(() =>
-        this.http.get<Client[]>(this.apiUrl, {
-          headers: headers(environment.user, environment.password),
-        }).pipe(
+        this.http.get<Client[]>(`https://${environment.host}/api/v1`).pipe(
           catchError((error) => {
             console.error('Error en getClients:', error);
             return of([]);
@@ -34,31 +26,22 @@ export class ClientService {
     );
   }
 
-  getClientByAnyFields(fieldName: string, value: string): Observable<Client[]> {
-    return this.http.get<Client[]>(`${this.apiUrl}/${fieldName}/${value}`, {
-      headers: headers(environment.user, environment.password),
-    }).pipe(
-      catchError((error) => {
-        console.error(`Error en getClientByAnyFields(${fieldName}, ${value}):`, error);
-        return of([]);
-      })
-    );
+  getAdvancedSearch<T extends keyof Client>(
+    clients: Client[],
+    field: T,
+    value: Client[T]
+  ): Client[] {
+    return clients.filter(client => 
+      typeof client[field] === 'string' && 
+      client[field].toLocaleLowerCase().includes(value?.toLocaleLowerCase() as string));
   }
 
   refreshClients() {
     this.refreshTrigger.next();
   }
 
-  getClientById(id: string): Observable<Client> {
-    return this.http.get<Client>(`${this.apiUrl}/${id}`, {
-      headers: headers(environment.user, environment.password),
-    });
-  }
-
   createClient(client: Client): Observable<Client> {
-    return this.http.post<Client>(this.apiUrl, client, {
-      headers: headers(environment.admin, environment.adminPassword),
-    }).pipe(
+    return this.http.post<Client>(`https://${environment.host}/api/v1`, client).pipe(
       catchError((error) => {
         console.error('Error en createClient:', error);
         return of();
@@ -66,21 +49,17 @@ export class ClientService {
     );
   }
 
-  updateClient(id: string, client: Client): Observable<Client> {
-    return this.http.put<Client>(`${this.apiUrl}/${id}`, client, {
-      headers: headers(environment.admin, environment.adminPassword),
-    }).pipe(
+  updateClient(client: Client): Observable<Client> {
+    return this.http.patch<Client>(`https://${environment.host}/api/v1/${client.id}`, client).pipe(
       catchError((error) => {
-        console.error(`Error en updateClient(${id}):`, error);
+        console.error(`Error en updateClient(${client.id}):`, error);
         return of();
       })
     );
   }
 
   deleteClient(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, {
-      headers: headers(environment.admin, environment.adminPassword),
-    }).pipe(
+    return this.http.delete<void>(`https://${environment.host}/api/v1/${id}`).pipe(
       catchError((error) => {
         console.error(`Error en deleteClient(${id}):`, error);
         return of();

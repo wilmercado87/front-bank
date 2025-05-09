@@ -9,11 +9,11 @@ describe('ClientService', () => {
   let httpMock: HttpTestingController;
 
   const mockClient: Client = {
-    sharedKey: '123',
-    businessId: 'Biz',
+    id: '123',
+    name: 'Biz',
     email: 'test@example.com',
     phone: 1234567890,
-    dataAdded: '2024-01-01|2024-12-31',
+    dataDates: '2024-01-01|2024-12-31',
   };
 
   beforeEach(() => {
@@ -44,11 +44,11 @@ describe('ClientService', () => {
   });
 
   it('debería obtener un cliente por ID', () => {
-    service.getClientById(mockClient.sharedKey).subscribe((client) => {
+    service.getClientById(mockClient.id).subscribe((client) => {
       expect(client).toEqual(mockClient);
     });
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/${mockClient.sharedKey}`);
+    const req = httpMock.expectOne(`${environment.apiUrl}/${mockClient.id}`);
     expect(req.request.method).toBe('GET');
     req.flush(mockClient);
   });
@@ -65,22 +65,22 @@ describe('ClientService', () => {
   });
 
   it('debería actualizar un cliente existente', () => {
-    service.updateClient(mockClient.sharedKey, mockClient).subscribe((client) => {
+    service.updateClient(mockClient.id, mockClient).subscribe((client) => {
       expect(client).toEqual(mockClient);
     });
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/${mockClient.sharedKey}`);
+    const req = httpMock.expectOne(`${environment.apiUrl}/${mockClient.id}`);
     expect(req.request.method).toBe('PUT');
     expect(req.request.body).toEqual(mockClient);
     req.flush(mockClient);
   });
 
   it('debería eliminar un cliente', () => {
-    service.deleteClient(mockClient.sharedKey).subscribe((response) => {
+    service.deleteClient(mockClient.id).subscribe((response) => {
       expect(response).toBeUndefined();
     });
 
-    const req = httpMock.expectOne(`${environment.apiUrl}/${mockClient.sharedKey}`);
+    const req = httpMock.expectOne(`${environment.apiUrl}/${mockClient.id}`);
     expect(req.request.method).toBe('DELETE');
     req.flush(null);
   });

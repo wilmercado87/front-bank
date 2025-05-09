@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { NewClientComponent } from './new-client/new-client.component';
 import { Client } from '../../models/client';
 import { ClientService } from '../../services/client.service';
-import { catchError, of, finalize } from 'rxjs';
 import { AdvancedSearchComponent } from "../advanced-search/advanced-search.component";
 import { NgxPaginationModule } from 'ngx-pagination';
 import { Papa } from 'ngx-papaparse';
@@ -17,16 +16,17 @@ import { Utility } from '../../utils/utility';
   styleUrl: './clients.component.scss'
 })
 export class ClientsComponent implements OnInit {
+  columns = Utility.columns;
   @ViewChild('newClient') clientModal!: NewClientComponent;
   @ViewChild('advancedSearch') searchModal!: AdvancedSearchComponent;
-  @ViewChild('inputKey') inputElement!: ElementRef<HTMLInputElement>;
 
   clientService: ClientService = inject(ClientService);
+  papa = inject(Papa);
+
   signalClients: WritableSignal<Client[]> = signal<Client[]>([]);
-  sharedKey = signal<string>('');
+  id = signal<string>('');
   loading = signal<boolean>(false);
   page = signal(1);
-  papa = inject(Papa);
 
   dynamicTitle: WritableSignal<string> = signal('');
 
@@ -35,26 +35,39 @@ export class ClientsComponent implements OnInit {
   }
 
   loadClients() {
-    this.clientService.getClients().subscribe(clients => {
+    this.loading.set(true);
+    const storedClients = localStorage.getItem('clients');
+    if (storedClients) {
+      const clients = JSON.parse(storedClients);
       this.signalClients.update(() => clients);
+      this.loading.set(false);
+      return;
+    }
+
+    this.clientService.getClients()
+      .subscribe(clients => {
+        this.signalClients.update(() => clients);
+        localStorage.setItem('clients', JSON.stringify(clients));
+        this.loading.set(false);
     });
   }
 
   openClientModal(title: string, client?: Client) {
+    let isNewClient = true;
     this.dynamicTitle.set(title);
     this.clientModal.title = title;
-    this.clientModal.clientForm.get('sharedKey')?.enable();
-    let isNewClient = true;
+    
     if (client) {
       isNewClient = false;
-      this.clientModal.clientForm.get('sharedKey')?.disable();
+      this.clientModal.clientForm.get('id')?.enable();
       this.clientModal.clientForm.patchValue({
-        sharedKey: client?.sharedKey,
-        businessId: client?.businessId,
+        id: client?.id,
+        document: client?.document,
+        name: client?.name,
         phone: client?.phone,
         email: client?.email,
-        startDate: client?.dataAdded.split('|')[0],
-        endDate: client?.dataAdded.split('|')[1],
+        startDate: client?.dataDates.split(' ')[0],
+        endDate: client?.dataDates.split(' ')[1],
       });
     }
     this.clientModal.openModal(isNewClient);
@@ -65,84 +78,47 @@ export class ClientsComponent implements OnInit {
   }
 
   handleNewClient(client: Client) {
-    let existingClient = this.signalClients().find(c => c.sharedKey === client.sharedKey);
+    let existingClient = this.signalClients().find(c => c.document === client.document);
     if (existingClient) {
-      this.clientModal.clientForm.get('sharedKey')?.setErrors({ duplicate: true });
+      this.clientModal.clientForm.get('document')?.setErrors({ duplicate: true });
       return;
     }
 
-    this.clientService.createClient(client).subscribe((newClient: Client) => {
+    this.clientService.createClient(client).subscribe(() => {
       this.clientModal.closeModal();
       this.refreshClients();
     });
   }
 
   handleUpdateClient(client: Client) {
-    this.clientService.updateClient(client.sharedKey, client).subscribe(() => {
+    this.clientService.updateClient(client).subscribe(() => {
       this.clientModal.closeModal();
       this.refreshClients();
     });
   }
 
   handleData(data: any) {
-    this.inputElement.nativeElement.value = '';
-    this.loading.set(true); 
-    this.clientService.getClientByAnyFields(data.field, data.value).pipe(
-    ).subscribe((clients) => {
-        this.searchModal.closeModal();
-        this.loading.set(false); 
-        this.signalClients.update(() => clients);
-    });
+    this.signalClients.update(() => 
+      this.clientService.getAdvancedSearch(this.signalClients(), data.field, data.value)
+    );
+    this.searchModal.closeModal();
   }
 
-  refreshClients() {
-    this.inputElement.nativeElement.value = '';
-    this.clientService.refreshClients();
-  }
-
-  keyUp(sharedKey: string) {
-    if ((!sharedKey || sharedKey.trim() === '') && this.signalClients().length < 2) {
-      this.refreshClients();
-    }
-  }
-
-  searchByKey(sharedKey: string) {
-    if (!sharedKey || sharedKey.trim() === '' || sharedKey.length < 3) {
-      return;
-    }
-
-    this.loading.set(true); 
-    this.clientService.getClientById(sharedKey).pipe(
-      catchError((error) => {
-        this.signalClients.update(() => []);
-        return of(null);
-      }),
-      finalize(() => {
-        this.loading.set(false); 
-      })
-    ).subscribe((client) => {
-      if (client) {
-        this.signalClients.update(() => [client]);
-      }
-    });
-  }
-
-  removeClient(sharedKey: string) {
-    this.loading.set(true); 
-    this.clientService.deleteClient(sharedKey).pipe(
-      finalize(() => {
-        this.loading.set(false); 
-      })
-    ).subscribe(() => {
-      this.signalClients.update(() => this.signalClients().filter(c => c.sharedKey !== sharedKey));
+  removeClient(id: string) {
+    this.clientService.deleteClient(id).subscribe(() => {
+      this.signalClients.update(() => this.signalClients().filter(c => c.id !== id));
     });
   }
 
   updateClient(client: Client) {
-    this.clientService.updateClient(client.sharedKey, client).subscribe(() => {
+    this.clientService.updateClient(client).subscribe(() => {
       this.clientModal.closeModal();
       this.refreshClients();
     });
+  }
+
+  refreshClients() {
+    this.clientService.refreshClients();
   }
 
   downloadCSV() {
@@ -151,18 +127,24 @@ export class ClientsComponent implements OnInit {
       return;
     }
     
-    const csv = this.papa.unparse(clients.map(client => ({
-      sharedKey: client.sharedKey,
-      businessId: client.businessId,
-      email: client.email,
-      phone: client.phone,
-      dataAdded: client.dataAdded,
-    })));
+    const csv = this.papa.unparse(clients.map(client => [
+          client.id || '',
+          client.document,
+          client.name,
+          client.email,
+          client.phone,
+          client.dataDates,
+        ]), {
+          quotes: false,
+          delimiter: ",",
+          header: true,
+          columns: ['id', 'document', 'name', 'email', 'phone', 'dataDates']
+        });
     Utility.exportToCSV('clients.csv', csv);
   }
 
   trackByClient(index: number, client: Client) {
-    return client.sharedKey;
+    return client.id;
   }
 
 }

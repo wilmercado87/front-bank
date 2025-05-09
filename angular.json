@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "front-alianza": {
+    "front-bank": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,13 +17,18 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/front-alianza",
+            "outputPath": "dist/front-bank",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
             ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/styles"
+              ]
+            },
             "assets": [
               {
                 "glob": "**/*",
@@ -80,10 +85,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "front-alianza:build:production"
+              "buildTarget": "front-bank:build:production"
             },
             "development": {
-              "buildTarget": "front-alianza:build:development"
+              "buildTarget": "front-bank:build:development"
             }
           },
           "defaultConfiguration": "development"

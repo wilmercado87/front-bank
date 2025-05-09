@@ -1,4 +1,6 @@
+@use 'variables' as *;
+
 .title-clients {
-    color: #4181ca;
+    color: $color-secondary;
     font-weight: bold;
 }

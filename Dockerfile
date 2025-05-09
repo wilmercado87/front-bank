@@ -27,7 +27,7 @@ WORKDIR /app
 RUN npm install -g http-server
 
 # Copiar los archivos de build desde la etapa anterior
-COPY --from=build /app/dist/front-alianza/browser /app/dist
+COPY --from=build /app/dist/front-bank/browser /app/dist
 
 # Exponer el puerto en el que se servirá la aplicación
 EXPOSE 4200

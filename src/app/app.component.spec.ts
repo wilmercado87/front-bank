@@ -22,10 +22,10 @@ describe('AppComponent', () => {
     expect(app.title).toBeDefined();
   });
 
-  it('debería tener el título "front-alianza"', () => {
+  it('debería tener el título "front-bank"', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toBe('front-alianza');
+    expect(app.title).toBe('front-bank');
   });
 
   it('debería renderizar el RouterOutlet', () => {

@@ -1,10 +1,9 @@
 <div class="d-flex">
 
-
     <div class="content w-100">
         <div class="row g-2 mb-3">
             <div class="col-12 col-md-auto">
-                <button class="btn btn-custom w-100" (click)="openClientModal('Create New Client')">
+                <button class="btn btn-custom w-100" (click)="openClientModal('New Client')">
                     <i class="bi bi-plus"></i> New
                 </button>
             </div>
@@ -16,13 +15,6 @@
         </div>
     
         <div class="row g-2 mb-3">
-            <div class="col-12 col-md-4">
-                <input (keyup)="keyUp(inputKey.value)" #inputKey type="text" 
-                       class="form-control" placeholder="Enter shared key">
-            </div>
-            <div class="col-6 col-md-auto">
-                <button class="btn btn-secondary w-100" (click)="searchByKey(inputKey.value)">Search</button>
-            </div>
             <div class="col-6 col-md-auto">
                 <button class="btn btn-custom w-100" (click)="openSearchModal()">Advanced Search</button>
             </div>
@@ -34,19 +26,17 @@
 
         <div class="row g-2 mb-3">
             <div class="title-clients col-12 col-md-auto">
-                Clients
+                List of clients
             </div>
         </div>
 
         <div class="col-12">
             <table class="table table-responsive table-bordered">
-                <thead class="table-light text-white">
+                <thead class="table-light text-white text-center">
                     <tr>
-                        <th>Shared Key</th>
-                        <th>Business ID</th>
-                        <th>E-mail</th>
-                        <th>Phone</th>
-                        <th>Data Added</th>
+                        @for (col of columns; track col.key) {
+                            <th>{{ col.name }}</th>
+                        }
                         <th><i class="bi bi-pencil"></i></th>
                         <th><i class="bi bi-trash"></i></th>
                     </tr>
@@ -61,17 +51,15 @@
                             </td>
                         </tr>
                     }@else {
-                        <tr *ngFor="let client of signalClients() | paginate: { itemsPerPage: 10, currentPage: page() }">
-                            <td>{{ client.sharedKey }}</td>
-                            <td>{{ client.businessId }}</td>
-                            <td>{{ client.email }}</td>
-                            <td>{{ client.phone }}</td>
-                            <td>{{ client.dataAdded.split('|')[0] }}  {{ client.dataAdded.split('|')[1] }}</td>
+                        <tr class="text-center" *ngFor="let client of signalClients() | paginate: { itemsPerPage: 10, currentPage: page() }">
+                            <td *ngFor="let col of columns" [attr.data-label]="col.name">
+                                {{ client[col.key] }}
+                            </td>
                             <td>
                                 <button class="btn btn-primary btn-sm" (click)="openClientModal('Update Client', client)"><i class="bi bi-pencil"></i></button>
                             </td>
                             <td>
-                                <button class="btn btn-primary btn-sm" (click)="removeClient(client.sharedKey)"><i class="bi bi-trash"></i></button>
+                                <button class="btn btn-primary btn-sm" (click)="removeClient(client.id ?? '')"><i class="bi bi-trash"></i></button>
                             </td>
                         </tr>
                         <tr>
@@ -88,7 +76,7 @@
 
             <div>
                 <tr *ngIf="!loading() && signalClients().length === 0">
-                    <td colspan="7" class="text-center text-muted">No client found</td>
+                    <td colspan="7" class="text-center text-muted">Data not found</td>
                 </tr>
             </div>
         </div>

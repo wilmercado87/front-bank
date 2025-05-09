@@ -1,5 +1,5 @@
 <!-- New Client Modal -->
-<div class="modal fade" #newClientModal id="newClientModal" tabindex="-1" aria-labelledby="newClientModalLabel" aria-hidden="true">
+<div class="modal fade" #newClientModal id="newClientModal" tabindex="-1" aria-labelledby="newClientModalLabel">
     <div class="modal-dialog">
         <div class="modal-content" style="background-color: #cce5ff; padding: 20px; border-radius: 8px;">
             <div class="modal-header">
@@ -9,25 +9,26 @@
             <form [formGroup]="clientForm">
                 <div class="modal-body">
                         <div class="mb-3">
-                            <label for="name" class="form-label">Shared Key</label>
-                            <input type="text" class="form-control" id="sharedKey" formControlName="sharedKey">
-                            @if (isInvalid('sharedKey') && !clientForm.get('sharedKey')?.errors?.['duplicate']) {
+                            <input type="hidden" class="form-control" id="id" formControlName="id">
+                            <label for="document" class="form-label">Document</label>
+                            <input #document type="text" class="form-control" id="document" formControlName="document" [readOnly]="!isNewClient">
+                            @if (isInvalid('document') && !clientForm.get('document')?.errors?.['duplicate']) {
                                 <div class="text-danger">
-                                    Shared Key es obligatorio y debe tener al menos 3 caracteres.
+                                    Document is required and must be at least 8 characters long.
                                 </div>
                             }
-                            @if (clientForm.get('sharedKey')?.errors?.['duplicate']) {
+                            @if (clientForm.get('document')?.errors?.['duplicate']) {
                                 <div class="text-danger">
-                                    Shared Key ya existe.
+                                    Document already exists.
                                 </div>
                             }
                         </div>
                         <div class="mb-3">
-                            <label for="businessId" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="businessId" formControlName="businessId">
-                            @if (isInvalid('businessId')) {
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" formControlName="name">
+                            @if (isInvalid('name')) {
                                 <div class="text-danger">
-                                    Nombre es obligatorio.
+                                    Name is required.
                                 </div>
                             }
                         </div>
@@ -36,7 +37,7 @@
                             <input type="text" class="form-control" id="phone" formControlName="phone">
                             @if (isInvalid('phone')) {
                                 <div class="text-danger">
-                                    Ingresa un número de teléfono válido (10 dígitos).
+                                    Enter a valid phone number (10 digits).
                                 </div>
                             }
                         </div>
@@ -45,7 +46,7 @@
                             <input type="email" class="form-control" id="email" formControlName="email">
                             @if (isInvalid('email')) {
                                 <div class="text-danger">
-                                    Ingresa un correo electrónico válido.
+                                    Enter a valid email address.
                                 </div>
                             }
                         </div>
@@ -54,7 +55,7 @@
                             <input type="date" class="form-control" id="startDate" formControlName="startDate">
                             @if (isInvalid('startDate')) {
                                 <div class="text-danger">
-                                    Fecha inicial es obligatoria.
+                                    Start date is required.
                                 </div>
                             }
                         </div>
@@ -63,7 +64,7 @@
                             <input type="date" class="form-control" id="endDate" formControlName="endDate">
                             @if (isInvalid('endDate')) {
                                 <div class="text-danger">
-                                    Fecha final es obligatoria.
+                                    End date is required.
                                 </div>
                             }
                         </div>
