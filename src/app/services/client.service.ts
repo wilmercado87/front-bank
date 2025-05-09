@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class ClientService {
-  private refreshTrigger = new BehaviorSubject<void>(null as any);
+  refreshTrigger = new BehaviorSubject<void>(null as any);
   http = inject(HttpClient);
 
   constructor() {}

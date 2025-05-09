@@ -1,150 +1,179 @@
-import { Component, inject, OnInit, WritableSignal, signal, ViewChild, ElementRef, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { NewClientComponent } from './new-client/new-client.component';
+import { Component, OnInit, WritableSignal, inject, signal } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Client } from '../../models/client';
 import { ClientService } from '../../services/client.service';
-import { AdvancedSearchComponent } from "../advanced-search/advanced-search.component";
 import { NgxPaginationModule } from 'ngx-pagination';
 import { Papa } from 'ngx-papaparse';
-import { Utility } from '../../utils/utility';
+import { FORMAT_DD_MM_YYYY, Utility } from '../../utils/utility';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { ClientDialogComponent } from './client-dialog/client-dialog.component';
+import { AdvancedSearchComponent } from '../advanced-search/advanced-search.component';
 
 @Component({
   selector: 'app-clients',
-  imports: [CommonModule, NgxPaginationModule, NewClientComponent, AdvancedSearchComponent],
-  providers: [Papa],
+  imports: [CommonModule, NgxPaginationModule],
+  providers: [Papa, DatePipe],
   templateUrl: './clients.component.html',
   styleUrl: './clients.component.scss'
 })
 export class ClientsComponent implements OnInit {
   columns = Utility.columns;
-  @ViewChild('newClient') clientModal!: NewClientComponent;
-  @ViewChild('advancedSearch') searchModal!: AdvancedSearchComponent;
-
-  clientService: ClientService = inject(ClientService);
+  clientService = signal(inject(ClientService));
   papa = inject(Papa);
-
   signalClients: WritableSignal<Client[]> = signal<Client[]>([]);
   loading = signal<boolean>(false);
   page = signal(1);
+  dialogRef!: MatDialogRef<ClientDialogComponent>;
 
-  dynamicTitle: WritableSignal<string> = signal('');
+  constructor(private dialog: MatDialog, private datePipe: DatePipe) {}
 
   ngOnInit(): void {
     this.loadClients();
   }
 
-  loadClients() {
+  private formatClient(formData: any, isUpdate: boolean = false): Client {
+  const client: Client = {
+    document: formData.document,
+    name: formData.name,
+    email: formData.email,
+    phone: formData.phone,
+    dataDates:
+      this.datePipe.transform(formData.startDate, FORMAT_DD_MM_YYYY)! + ' ' +
+      this.datePipe.transform(formData.endDate, FORMAT_DD_MM_YYYY)!,
+    };
+
+    if (isUpdate) {
+      client.id = formData.id;
+    }
+
+    return client;
+  }
+
+  loadClients(forceRefresh = false) {
     this.loading.set(true);
-    const storedClients = localStorage.getItem('clients');
-    if (storedClients) {
-      const clients = JSON.parse(storedClients);
-      this.signalClients.update(() => clients);
-      this.loading.set(false);
-      return;
-    }
 
-    this.clientService.getClients()
-      .subscribe(clients => {
-        this.signalClients.update(() => clients);
-        localStorage.setItem('clients', JSON.stringify(clients));
+    if (!forceRefresh) {
+      const storedClients = localStorage.getItem('clients');
+      if (storedClients) {
+        this.updateStateAndStorage(JSON.parse(storedClients));
         this.loading.set(false);
+        return;
+      }
+    }
+
+    this.clientService().getClients().subscribe(clients => {
+      this.updateStateAndStorage(clients);
+      this.loading.set(false);
     });
   }
 
-  openClientModal(title: string, client?: Client) {
-    let isNewClient = true;
-    this.dynamicTitle.set(title);
-    this.clientModal.title = title;
-    
-    if (client) {
-      isNewClient = false;
-      this.clientModal.clientForm.get('id')?.enable();
-      this.clientModal.clientForm.patchValue({
-        id: client?.id,
-        document: client?.document,
-        name: client?.name,
-        phone: client?.phone,
-        email: client?.email,
-        startDate: client?.dataDates.split(' ')[0],
-        endDate: client?.dataDates.split(' ')[1],
-      });
-    }
-    this.clientModal.openModal(isNewClient);
-  }
+  openAdvancedSearch() {
+    const dialogRef = this.dialog.open(AdvancedSearchComponent, {
+      disableClose: true,
+      width: '600px',
+      data: { title: 'Advanced Search' },
+    });
 
-  openSearchModal() {
-    this.searchModal.openModal();
-  }
-
-  handleNewClient(client: Client) {
-    let existingClient = this.signalClients().find(c => c.document === client.document);
-    if (existingClient) {
-      this.clientModal.clientForm.get('document')?.setErrors({ duplicate: true });
-      return;
-    }
-
-    this.clientService.createClient(client).subscribe(() => {
-      this.clientModal.closeModal();
-      this.refreshClients();
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.handleData(result);
+      }
     });
   }
 
-  handleUpdateClient(client: Client) {
-    this.clientService.updateClient(client).subscribe(() => {
-      this.clientModal.closeModal();
-      this.refreshClients();
+  openClientDialog(title: string, client?: Client): void {
+    this.dialogRef = this.dialog.open(ClientDialogComponent, {
+      disableClose: true,
+      width: '600px',
+      data: { title, client },
+    });
+
+    const instance = this.dialogRef.componentInstance;
+
+    instance.validateClient.subscribe((formData) => {
+      const isUpdate = !!client;
+
+      if (!isUpdate) {
+        const exists = this.signalClients().some(c => c.document === formData.document);
+        if (exists) {
+          instance.clientForm.get('document')?.setErrors({ duplicate: true });
+          instance.clientForm.get('document')?.markAsTouched();
+          return;
+        }
+      }
+
+      isUpdate ? this.updateClient(formData) : this.insertClient(formData);
+    });
+  }
+
+  insertClient(formData: any) {
+    const client = this.formatClient(formData);
+
+    this.clientService().createClient(client).subscribe((newClient) => {
+      const clients = [...this.signalClients(), newClient];
+      this.updateStateAndStorage(clients);
+      this.dialogRef.close();
+    });
+  }
+
+  updateClient(formData: any) {
+    const updatedClient = this.formatClient(formData, true);
+
+    this.clientService().updateClient(updatedClient).subscribe(() => {
+      const clients = this.signalClients().map(c =>
+        c.id === updatedClient.id ? { ...updatedClient } : c
+      );
+      this.updateStateAndStorage(clients);
+      this.dialogRef.close();
+    });
+  }
+
+  removeClient(id: string) {
+    this.clientService().deleteClient(id).subscribe(() => {
+      const clients = this.signalClients().filter(c => c.id !== id);
+      this.updateStateAndStorage(clients);
     });
   }
 
   handleData(data: any) {
-    this.signalClients.update(() => 
-      this.clientService.getAdvancedSearch(this.signalClients(), data.field, data.value)
-    );
-    this.searchModal.closeModal();
-  }
-
-  removeClient(id: string) {
-    this.clientService.deleteClient(id).subscribe(() => {
-      this.signalClients.update(() => this.signalClients().filter(c => c.id !== id));
-      this.refreshClients();
-    });
-  }
-
-  updateClient(client: Client) {
-    this.clientService.updateClient(client).subscribe(() => {
-      this.clientModal.closeModal();
-      this.refreshClients();
-    });
+    const result = this.clientService().getAdvancedSearch(this.signalClients(), data.field, data.value);
+    this.signalClients.update(() => result);
   }
 
   refreshClients() {
-    this.clientService.refreshClients();
+    this.loadClients(true);
+  }
+
+  private updateStateAndStorage(clients: Client[]) {
+    this.signalClients.update(() => clients);
+    localStorage.setItem('clients', JSON.stringify(clients));
   }
 
   downloadCSV() {
     const clients = this.signalClients();
-    if (!clients || clients.length === 0) {
-      return;
-    }
-    
-    const csv = this.papa.unparse(clients.map(client => [
-          client.id || '',
-          client.document,
-          client.name,
-          client.email,
-          client.phone,
-          client.dataDates,
-        ]), {
-          quotes: false,
-          delimiter: ",",
-          header: true,
-          columns: ['id', 'document', 'name', 'email', 'phone', 'dataDates']
-        });
+    if (clients.length === 0) return;
+
+    const csv = this.papa.unparse(
+      clients.map(client => [
+        client.id || '',
+        client.document,
+        client.name,
+        client.email,
+        client.phone,
+        client.dataDates,
+      ]), {
+        quotes: false,
+        delimiter: ",",
+        header: true,
+        columns: ['id', 'document', 'name', 'email', 'phone', 'dataDates']
+      }
+    );
+
     Utility.exportToCSV('clients.csv', csv);
   }
 
   trackByClient(index: number, client: Client) {
     return client.id;
   }
-
 }
+

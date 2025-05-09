@@ -3,7 +3,7 @@
     <div class="content w-100">
         <div class="row g-2 mb-3">
             <div class="col-12 col-md-auto">
-                <button class="btn btn-custom w-100" (click)="openClientModal('New Client')">
+                <button class="btn btn-custom w-100" (click)="openClientDialog('New Client')">
                     <i class="bi bi-plus"></i> New
                 </button>
             </div>
@@ -16,7 +16,7 @@
     
         <div class="row g-2 mb-3">
             <div class="col-6 col-md-auto">
-                <button class="btn btn-custom w-100" (click)="openSearchModal()">Advanced Search</button>
+                <button mat-flat-button class="btn btn-custom w-100" (click)="openAdvancedSearch()">Advanced Search</button>
             </div>
             <div class="col-6 col-md-auto">
                 <button class="btn btn-custom w-100" (click)="refreshClients()">Reload</button>
@@ -56,7 +56,7 @@
                                 {{ client[col.key] }}
                             </td>
                             <td>
-                                <button class="btn btn-primary btn-sm" (click)="openClientModal('Update Client', client)"><i class="bi bi-pencil"></i></button>
+                                <button class="btn btn-primary btn-sm" (click)="openClientDialog('Update Client', client)"><i class="bi bi-pencil"></i></button>
                             </td>
                             <td>
                                 <button class="btn btn-primary btn-sm" (click)="removeClient(client.id ?? '')"><i class="bi bi-trash"></i></button>
@@ -81,9 +81,5 @@
             </div>
         </div>
     </div>
-
-    <app-new-client #newClient [title]="dynamicTitle()" (newClient)="handleNewClient($event)" (updateClient)="handleUpdateClient($event)"/>
-    <app-advanced-search #advancedSearch title="Advanced Search" (data)="handleData($event)"/>
-    
 </div>
 

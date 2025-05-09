@@ -1,0 +1,52 @@
+<div class="modal-content-info">
+    <h2 mat-dialog-title>{{ data.title }}</h2>
+    <div mat-dialog-content>
+        <form [formGroup]="clientForm" class="form-container">
+            <mat-form-field appearance="fill" class="full-width custom-form-field" >
+                <mat-label>Document</mat-label>
+                <input matInput formControlName="document" [readonly]="!!data.client" />
+                <mat-error *ngIf="isInvalid('document')">Document is required.</mat-error>
+                <mat-error *ngIf="clientForm.get('document')?.errors?.['duplicate']">Document already exists.</mat-error>
+                <mat-error *ngIf="isInvalid('document') && !clientForm.get('document')?.errors?.['duplicate']">Document is required and must be at least 8 characters long.</mat-error>
+            </mat-form-field>
+        
+            <mat-form-field appearance="fill" class="full-width custom-form-field">
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="name" />
+                <mat-error *ngIf="isInvalid('name')">Name is required.</mat-error>
+            </mat-form-field>
+        
+            <mat-form-field appearance="fill" class="full-width">
+                <mat-label>Phone</mat-label>
+                <input matInput formControlName="phone" />
+                <mat-error *ngIf="isInvalid('phone')">Enter a valid phone number (10 digits).</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="full-width">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" />
+                <mat-error *ngIf="isInvalid('email')">Enter a valid email address.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field>
+                <input matInput [matDatepicker]="pickerStart" placeholder="Choose a start date" formControlName="startDate" />
+                <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
+                <mat-datepicker #pickerStart></mat-datepicker>
+                <mat-error *ngIf="isInvalid('startDate')">Start date is required.</mat-error>
+            </mat-form-field>
+
+            <mat-form-field>
+                <input matInput [matDatepicker]="pickerEnd" placeholder="Choose a end date" formControlName="endDate" />
+                <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+                <mat-datepicker #pickerEnd></mat-datepicker>
+                <mat-error *ngIf="isInvalid('endDate')">End date is required.</mat-error>
+            </mat-form-field>
+
+        </form>
+    </div>
+    <div mat-dialog-actions align="end">
+        <button mat-button (click)="onCancel()" type="button">Cancel</button>
+        <button mat-flat-button color="primary" (click)="onSubmit()" [disabled]="clientForm.invalid" type="submit">OK</button>
+    </div>
+</div>
+

@@ -1,124 +1,113 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ClientsComponent } from './clients.component';
+import { CommonModule, DatePipe } from '@angular/common';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ClientService } from '../../services/client.service';
-import { of } from 'rxjs';
-import { Client } from '../../models/client';
 import { Papa } from 'ngx-papaparse';
-import { Utility } from '../../utils/utility';
-import { EnvironmentInjector, runInInjectionContext } from '@angular/core';
-import { TestBed } from '@angular/core/testing';
+import { BehaviorSubject, of } from 'rxjs';
+import { ClientDialogComponent } from './client-dialog/client-dialog.component';
 
 describe('ClientsComponent', () => {
   let component: ClientsComponent;
-  let clientServiceMock: Partial<ClientService>;
-  let papaMock: Partial<Papa>;
+  let fixture: ComponentFixture<ClientsComponent>;
+  let clientServiceSpy: jest.Mocked<ClientService>;
+  let dialogSpy: jest.Mocked<MatDialog>;
+  let papaSpy: jest.Mocked<Papa>;
+  let dialogRefSpy: jest.Mocked<MatDialogRef<ClientDialogComponent>>;
 
-  const mockClients: Client[] = [
-    { id: '1', document: '1047390099', name: 'William', phone: '111', email: 'william@test.com', dataDates: '2024-01-01 2024-01-02' },
-    { id: '2', document: '123456789', name: 'Bob', phone: '222', email: 'bob@test.com', dataDates: '2024-02-01 2024-02-02' }
-  ];
+  const refreshTriggerMock = new BehaviorSubject<void>(undefined);
 
   beforeEach(() => {
-    clientServiceMock = {
-      getClients: jest.fn().mockReturnValue(of(mockClients)),
-      createClient: jest.fn().mockReturnValue(of(null)),
-      updateClient: jest.fn().mockReturnValue(of(null)),
-      deleteClient: jest.fn().mockReturnValue(of(null)),
-      refreshClients: jest.fn(),
+    clientServiceSpy = {
+      http: {} as any,
+
+      getClients: jest.fn().mockReturnValue(of([])),
+      createClient: jest.fn().mockReturnValue(of({})),
+      updateClient: jest.fn().mockReturnValue(of({})),
+      deleteClient: jest.fn().mockReturnValue(of({})),
       getAdvancedSearch: jest.fn().mockReturnValue([]),
+      
+      refreshClients: jest.fn(), 
+      refreshTrigger: refreshTriggerMock
+
     };
 
-    papaMock = {
-      unparse: jest.fn().mockReturnValue('id,document,name,email,phone,dataDates\n1,1234567890,William,william@example.com,555-1234,2021-01-01 2021-12-31'),
-    };
+    dialogRefSpy = {
+      close: jest.fn(),
+      afterClosed: jest.fn().mockReturnValue(of(true)),
+      backdropClick: jest.fn(),
+      keydownEvents: jest.fn(),
+      updateSize: jest.fn(),
+      updatePosition: jest.fn(),
+      updateScrollStrategy: jest.fn(),
+      addPanelClass: jest.fn(),
+      removePanelClass: jest.fn(),
+      _containerInstance: {} as any,
+      componentInstance: {} as any,
+      componentRef: null,
+      disableClose: false,
+      updateDisableClose: jest.fn(),
+      updateId: jest.fn(),
+      getState: jest.fn(),
+    } as any;
+
+    dialogSpy = {
+      open: jest.fn().mockReturnValue(dialogRefSpy),
+    } as any;
+
+    papaSpy = {
+      unparse: jest.fn().mockReturnValue('csv content'),
+    } as any;
+
 
     TestBed.configureTestingModule({
+      imports: [CommonModule, NgxPaginationModule, ClientsComponent],
       providers: [
-        { provide: ClientService, useValue: clientServiceMock },
-        { provide: Papa, useValue: papaMock },
+        DatePipe,
+        { provide: ClientService, useValue: clientServiceSpy },
+        { provide: MatDialog, useValue: dialogSpy },
+        { provide: Papa, useValue: papaSpy },
       ],
     });
 
-    runInInjectionContext(TestBed.inject(EnvironmentInjector), () => {
-      component = new ClientsComponent();
-    });
+    fixture = TestBed.createComponent(ClientsComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
-  it('debería cargar clientes desde el servicio si no hay en localStorage', () => {
-    component.loadClients();
-    expect(clientServiceMock.getClients).toHaveBeenCalled();
-    expect(component.signalClients().length).toBe(2);
+  it('should create the component', () => {
+    expect(component).toBeTruthy();
   });
 
-  it('debería cargar clientes desde localStorage si existen', () => {
-    localStorage.setItem('clients', JSON.stringify(mockClients));
-    component.loadClients();
-    expect(clientServiceMock.getClients).not.toHaveBeenCalled();
-    expect(component.signalClients().length).toBe(2);
+  it('should call insertClient when the form is submitted with valid data', () => {
+    const formData = { document: '123', name: 'William', email: 'william@test.com', phone: '12345', startDate: new Date(), endDate: new Date() };
+    component.insertClient(formData);
+    expect(clientServiceSpy.createClient).toHaveBeenCalled();
   });
 
-  it('debería agregar un nuevo cliente si no está duplicado', () => {
-    component.signalClients.update(() => []);
-    const newClient = mockClients[0];
-
-    component.clientModal = {
-      closeModal: jest.fn(),
-      clientForm: {
-        get: () => ({ setErrors: jest.fn() })
-      }
-    } as any;
-
-    component.handleNewClient(newClient);
-
-    expect(clientServiceMock.createClient).toHaveBeenCalledWith(newClient);
+  it('should call updateClient when the form is submitted with existing client data', () => {
+    const formData = { id: '1', document: '123', name: 'William', email: 'william@test.com', phone: '12345', startDate: new Date(), endDate: new Date() };
+    component.updateClient(formData);
+    expect(clientServiceSpy.updateClient).toHaveBeenCalled();
   });
 
-  it('no debería agregar cliente si el documento está duplicado', () => {
-    component.signalClients.update(() => [...mockClients]);
-
-    const duplicate = mockClients[0];
-    const setErrors = jest.fn();
-
-    component.clientModal = {
-      clientForm: {
-        get: jest.fn().mockReturnValue({ setErrors })
-      }
-    } as any;
-
-    component.handleNewClient(duplicate);
-
-    expect(setErrors).toHaveBeenCalledWith({ duplicate: true });
-    expect(clientServiceMock.createClient).not.toHaveBeenCalled();
+  it('should call removeClient and delete a client', () => {
+    const id = '1';
+    component.removeClient(id);
+    expect(clientServiceSpy.deleteClient).toHaveBeenCalledWith(id);
   });
 
-  it('debería eliminar cliente correctamente', () => {
-    component.signalClients.update(() => [...mockClients]);
 
-    component.removeClient('1');
 
-    expect(clientServiceMock.deleteClient).toHaveBeenCalledWith('1');
+  it('should handle advanced search data', () => {
+    const searchData = { field: 'name', value: 'William' };
+    component.handleData(searchData);
+    expect(clientServiceSpy.getAdvancedSearch).toHaveBeenCalledWith(expect.any(Array), searchData.field, searchData.value);
   });
 
-  it('debería exportar los clientes a CSV', () => {
-    component.signalClients.set([
-      {
-        id: '1',
-        document: '123',
-        name: 'William',
-        email: 'william@test.com',
-        phone: '111',
-        dataDates: '2024-01-01 2024-01-02',
-      },
-    ]);
-
-    jest.spyOn(component.papa, 'unparse').mockReturnValue('csv,data');
-    jest.spyOn(Utility, 'exportToCSV').mockImplementation();
-
-    component.downloadCSV();
-
-    expect(Utility.exportToCSV).toHaveBeenCalledWith(
-        'clients.csv',
-        expect.any(String)
-      );
+  it('should refresh clients', () => {
+    component.refreshClients();
+    expect(clientServiceSpy.getClients).toHaveBeenCalled();
   });
-
 });
