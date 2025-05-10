@@ -6,8 +6,9 @@
                 <mat-label>Document</mat-label>
                 <input matInput formControlName="document" [readonly]="!!data.client" />
                 <mat-error *ngIf="isInvalid('document')">Document is required.</mat-error>
-                <mat-error *ngIf="clientForm.get('document')?.errors?.['duplicate']">Document already exists.</mat-error>
-                <mat-error *ngIf="isInvalid('document') && !clientForm.get('document')?.errors?.['duplicate']">Document is required and must be at least 8 characters long.</mat-error>
+                <mat-error *ngIf="document?.errors?.['duplicate']">Document already exists.</mat-error>
+                <mat-error *ngIf="document?.errors?.['maxlength']">Document must have a maximum of 10 digits.</mat-error>
+                <mat-error *ngIf="document?.errors?.['pattern']">Document only numbers are allowed.</mat-error>
             </mat-form-field>
         
             <mat-form-field appearance="fill" class="full-width custom-form-field">
@@ -19,13 +20,15 @@
             <mat-form-field appearance="fill" class="full-width">
                 <mat-label>Phone</mat-label>
                 <input matInput formControlName="phone" />
-                <mat-error *ngIf="isInvalid('phone')">Enter a valid phone number (10 digits).</mat-error>
+                <mat-error *ngIf="isInvalid('phone')">Phone is required.</mat-error>
+                <mat-error *ngIf="phone?.errors?.['pattern']">Enter a valid phone number (10 digits).</mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="fill" class="full-width">
                 <mat-label>Email</mat-label>
                 <input matInput formControlName="email" />
-                <mat-error *ngIf="isInvalid('email')">Enter a valid email address.</mat-error>
+                <mat-error *ngIf="isInvalid('email')">Email is required.</mat-error>
+                <mat-error *ngIf="email?.errors?.['email']">Enter a valid email address.</mat-error>
             </mat-form-field>
 
             <mat-form-field>
@@ -35,12 +38,18 @@
                 <mat-error *ngIf="isInvalid('startDate')">Start date is required.</mat-error>
             </mat-form-field>
 
+            <mat-error class="mat-error mat-form-field-subscript-wrapper" *ngIf="clientForm.errors?.['dateRangeInvalid'] && clientForm.touched">
+                The start date cannot be later than the end date.
+            </mat-error>
+
             <mat-form-field>
                 <input matInput [matDatepicker]="pickerEnd" placeholder="Choose a end date" formControlName="endDate" />
                 <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
                 <mat-datepicker #pickerEnd></mat-datepicker>
                 <mat-error *ngIf="isInvalid('endDate')">End date is required.</mat-error>
             </mat-form-field>
+
+            
 
         </form>
     </div>

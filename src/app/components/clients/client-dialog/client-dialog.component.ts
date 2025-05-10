@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Inject, Input, OnInit, Output } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { Client } from '../../../models/client';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MaterialModule } from '../../../material/material.module';
@@ -14,7 +14,6 @@ import { Utility } from '../../../utils/utility';
   styleUrl: './client-dialog.component.scss',
 })
 export class ClientDialogComponent implements OnInit {
-    @Input() title = '';
     @Output() validateClient = new EventEmitter<any>();
     clientForm!: FormGroup;
     
@@ -25,13 +24,24 @@ export class ClientDialogComponent implements OnInit {
         @Inject(MAT_DIALOG_DATA) public data: { title: string; client?: Client }) {
         this.clientForm = this.fb.group({
             id: [''],
-            document: ['', [Validators.required, Validators.minLength(8), Validators.pattern('^[0-9]{10}$')]],
+            document: ['', [Validators.required, Validators.maxLength(10), Validators.pattern('^[0-9]*$')]],
             name: ['', Validators.required],
             email: ['', [Validators.required, Validators.email]],
             phone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
             startDate: ['', Validators.required],
             endDate: ['', Validators.required],
-        });
+        }, { validators: this.dateRangeValidator });
+    }
+
+    dateRangeValidator(group: AbstractControl): ValidationErrors | null {
+        const start = group.get('startDate')?.value;
+        const end = group.get('endDate')?.value;
+
+        if (start && end && new Date(start) > new Date(end)) {
+            return { dateRangeInvalid: true };
+        }
+
+        return null;
     }
 
     ngOnInit(): void {
@@ -50,7 +60,7 @@ export class ClientDialogComponent implements OnInit {
     }
 
     isInvalid(field: string): any {
-        return this.clientForm.get(field)?.invalid && this.clientForm.get(field)?.touched;
+        return this.clientForm.get(field)?.hasError('required') && this.clientForm.get(field)?.touched;
     }
 
     onSubmit(): void {
@@ -62,6 +72,18 @@ export class ClientDialogComponent implements OnInit {
     onCancel() {
         this.clientForm.reset();
         this.dialogRef.close();
+    }
+
+    get document() {
+        return this.clientForm.get('document');
+    }
+
+    get phone() {
+        return this.clientForm.get('phone');
+    }
+
+    get email() {
+        return this.clientForm.get('email');
     }
     
 }
