@@ -33,7 +33,7 @@ export class ClientsComponent implements OnInit, OnDestroy {
 
   private formatClient(formData: any, isUpdate: boolean = false): Client {
     const client: Client = {
-      id: Utility.generateUniqueRandomString(LENGTH_HEXADECIMAL),
+      id: Utility.generateUniqueRandomString(LENGTH_HEXADECIMAL), /** comenetar esta linea si se quiere persistir */
       document: formData.document,
       name: formData.name,
       email: formData.email,
