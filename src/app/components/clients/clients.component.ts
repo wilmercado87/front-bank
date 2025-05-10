@@ -4,7 +4,7 @@ import { Client } from '../../models/client';
 import { ClientService } from '../../services/client.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { Papa } from 'ngx-papaparse';
-import { FORMAT_DD_MM_YYYY, Utility } from '../../utils/utility';
+import { FORMAT_DD_MM_YYYY, LENGTH_HEXADECIMAL, Utility } from '../../utils/utility';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { ClientDialogComponent } from './client-dialog/client-dialog.component';
 import { AdvancedSearchComponent } from '../advanced-search/advanced-search.component';
@@ -28,18 +28,19 @@ export class ClientsComponent implements OnInit, OnDestroy {
   constructor(private dialog: MatDialog, private datePipe: DatePipe) {}
 
   ngOnInit(): void {
-    this.loadClients();
+    this.loadClients(true);
   }
 
   private formatClient(formData: any, isUpdate: boolean = false): Client {
-  const client: Client = {
-    document: formData.document,
-    name: formData.name,
-    email: formData.email,
-    phone: formData.phone,
-    dataDates:
-      this.datePipe.transform(formData.startDate, FORMAT_DD_MM_YYYY)! + ' ' +
-      this.datePipe.transform(formData.endDate, FORMAT_DD_MM_YYYY)!,
+    const client: Client = {
+      id: Utility.generateUniqueRandomString(LENGTH_HEXADECIMAL),
+      document: formData.document,
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      dataDates:
+        this.datePipe.transform(formData.startDate, FORMAT_DD_MM_YYYY)! + ' ' +
+        this.datePipe.transform(formData.endDate, FORMAT_DD_MM_YYYY)!,
     };
 
     if (isUpdate) {

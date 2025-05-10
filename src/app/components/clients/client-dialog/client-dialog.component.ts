@@ -4,13 +4,12 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Client } from '../../../models/client';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { MaterialModule } from '../../../material/material.module';
 import { Utility } from '../../../utils/utility';
 
 @Component({
   selector: 'app-client-dialog',
-  imports: [CommonModule, ReactiveFormsModule, MaterialModule, MatDatepickerModule, MatNativeDateModule],
+  imports: [CommonModule, ReactiveFormsModule, MaterialModule, MatDatepickerModule],
   templateUrl: './client-dialog.component.html',
   styleUrl: './client-dialog.component.scss',
 })

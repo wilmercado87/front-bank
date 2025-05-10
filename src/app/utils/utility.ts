@@ -1,6 +1,7 @@
 import { Modal } from "bootstrap";
 import { Client } from "../models/client";
 import { ElementRef } from "@angular/core";
+import { MatDateFormats } from "@angular/material/core";
 
 export class Utility {
 
@@ -50,19 +51,36 @@ export class Utility {
     const [day, month, year] = dateString.split('/');
     return new Date(+year, +month - 1, +day);
   }
+
+  static generateUniqueRandomString(length: number): string {
+    const characters = HEXADECIMAL;
+    let result = '';
+    
+    const timestamp = Date.now().toString(NUM_HEXADECIMAL);
+    result += timestamp;
+    
+    while (result.length < length) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      result += characters.charAt(randomIndex);
+    }
+    
+    return result.substring(0, length);
+  }
 }
 
-export const CUSTOM_DATE_FORMATS = {
+export const CUSTOM_DATE_FORMATS: MatDateFormats = {
   parse: {
-    dateInput: 'DD/MM/YYYY',
+    dateInput: 'dd/MM/yyy',
   },
   display: {
-    dateInput: 'DD/MM/YYYY',
-    monthYearLabel: 'MMMM YYYY',
-    dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM YYYY',
+    dateInput: 'dd/MM/yyyy', 
+    monthYearLabel: 'MMMM yyyy',
+    dateA11yLabel: 'LL', 
+    monthYearA11yLabel: 'MMMM yyyy',
   },
 };
-
 export const FORMAT_DD_MM_YYYY = 'dd/MM/yyyy';
+export const HEXADECIMAL = '0123456789abcdef';
+export const NUM_HEXADECIMAL = 16;
+export const LENGTH_HEXADECIMAL = 26;
 

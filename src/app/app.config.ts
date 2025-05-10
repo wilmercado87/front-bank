@@ -7,8 +7,10 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { NgxPaginationModule } from 'ngx-pagination';
 import { rapidApiInterceptor } from './interceptors/rapidapi.interceptor';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
-import { MomentDateAdapter, MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapter';
+import { provideDateFnsAdapter } from '@angular/material-date-fns-adapter';
+import { enUS } from 'date-fns/locale';
+import { MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+
 import { CUSTOM_DATE_FORMATS } from './utils/utility';
 
 export const appConfig: ApplicationConfig = {
@@ -22,14 +24,10 @@ export const appConfig: ApplicationConfig = {
     provideAnimations(),
     importProvidersFrom(
       NgxPaginationModule, 
-      MatDatepickerModule,
-      MatNativeDateModule),
-      { provide: MAT_DATE_LOCALE, useValue: 'es-CO' },
-    {
-      provide: DateAdapter,
-      useClass: MomentDateAdapter,
-      deps: [MAT_DATE_LOCALE, MAT_MOMENT_DATE_ADAPTER_OPTIONS],
-    },
-    { provide: MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS },
+      MatDatepickerModule),
+      provideDateFnsAdapter(),
+    { provide: MAT_DATE_LOCALE, useValue: enUS },
+    { provide: MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS }
+    ,
   ]
 };

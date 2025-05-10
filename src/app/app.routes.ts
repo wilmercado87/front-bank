@@ -6,7 +6,11 @@ export const routes: Route[] = [
     {
       path: 'clients',
       loadComponent: () => import('../app/components/clients/clients.component').then(m => m.ClientsComponent),
-      outlet: 'main'
+    },
+    {
+      path: '',
+      redirectTo: '/clients',
+      pathMatch: 'full'
     },
     {
       path: '**',

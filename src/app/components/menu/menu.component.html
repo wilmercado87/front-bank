@@ -2,8 +2,7 @@
     <div>
         <h1>BANK OF CLIENTS</h1>
     </div>
-    <a routerLink="/">Home</a>
-    <a [routerLink]="[{ outlets: { main: ['clients'] } }]">Client</a>
+    <a routerLink="/clients">Client</a>
 </div>
 
 <!-- Botón para abrir el menú en móviles -->
@@ -21,8 +20,7 @@
     <div class="offcanvas-body">
         <h2>BANK OF CLIENTS</h2>
         <nav class="nav flex-column mt-3">
-            <a class="nav-link" routerLink="/" data-bs-dismiss="offcanvas">Home</a>
-            <a class="nav-link" [routerLink]="[{ outlets: { main: ['clients'] } }]" data-bs-dismiss="offcanvas">Clientes</a>
+            <a class="nav-link" routerLink="/clients" data-bs-dismiss="offcanvas">Clientes</a>
         </nav>
     </div>
 </div>
