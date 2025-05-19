@@ -15,10 +15,10 @@
         </div>
     
         <div class="row g-2 mb-3">
-            <div class="col-6 col-md-auto">
+            <div class="col-12 col-md-auto">
                 <button mat-flat-button class="btn btn-custom w-100" (click)="openAdvancedSearch()">Advanced Search</button>
             </div>
-            <div class="col-6 col-md-auto">
+            <div class="col-12 col-md-auto">
                 <button class="btn btn-custom w-100" (click)="refreshClients()">Reload</button>
             </div>
             
@@ -51,7 +51,7 @@
                             </td>
                         </tr>
                     }@else {
-                        <tr class="text-center" *ngFor="let client of signalClients() | paginate: { itemsPerPage: 10, currentPage: page() }">
+                        <tr class="text-center" *ngFor="let client of signalClients() | paginate: { itemsPerPage: 10, currentPage: page() }; trackByClient">
                             <td *ngFor="let col of columns" [attr.data-label]="col.name">
                                 {{ client[col.key] }}
                             </td>

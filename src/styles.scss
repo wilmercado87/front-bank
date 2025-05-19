@@ -1,98 +1,95 @@
-/* You can add global styles to this file, and also import other style files */
-/* src/styles.css o src/styles.scss */
+/* src/styles.scss */
 @use 'variables' as *;
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
 body {
-    font-family: Arial, sans-serif;
+  font-family: Arial, sans-serif;
+
+  @media (max-width: 750px) {
+    padding-top: 70px;
+  }
 }
 
 .content {
-    margin-left: 270px;
-    padding: 20px;
+  margin-left: 270px;
+  padding: 20px;
+
+  @media (max-width: 750px) {
+    margin-left: 0;
+    padding: 8px;
+  }
+}
+
+.sidebar {
+  @media (max-width: 750px) {
+    display: none;
+  }
 }
 
 .modal-content-info {
-    background-color: $color-blue-light-secondary; 
-    padding: 20px; 
-    border-radius: 8px;
+  background-color: $color-blue-light-secondary;
+  padding: 20px;
+  border-radius: 8px;
 }
 
 .table-container {
-    background: $color-background;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: $color-gray-light 0px 0px 10px;
+  background: $color-background;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px $color-gray-light;
 }
 
 .header-buttons {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 }
 
 .btn-custom {
+  background-color: $color-blue-light;
+  border-color: $color-secondary;
+  color: $color-background;
+
+  &:hover {
     background-color: $color-blue-light;
     border-color: $color-secondary;
-    color: $color-background;
+  }
 }
 
-.btn-custom:hover {
-    background-color: $color-blue-light;
-    border-color: $color-secondary;
-}
+.table {
+  @media (max-width: 750px) {
+    font-size: 12px;
 
-pagination-controls {
-    margin-right: 90px;
-}
-
-@media (max-width: 750px) {
-    .sidebar {
-        display: none;
+    thead {
+      display: none;
     }
 
-    .content {
-        margin-left: 0px;
-        padding: 8px;
-    }
-
-    .table {
-        font-size: 12px;
-    }
-
-    .table thead {
-        display: none;
-    }
-
-    .table tbody tr {
+    tbody {
+      tr {
         display: block;
         margin-bottom: 15px;
         border: 1px solid $color-gray-light;
         padding: 10px;
-    }
+      }
 
-    .table tbody td {
+      td {
         display: flex;
         justify-content: space-between;
         padding: 5px;
-    }
 
-    .table tbody td::before {
-        content: attr(data-label);
-        font-weight: bold;
-        text-transform: capitalize;
+        &::before {
+          content: attr(data-label);
+          font-weight: bold;
+          text-transform: capitalize;
+        }
+      }
     }
-
-    .row.g-2 .col-12,
-    .row.g-2 .col-6 {
-        width: 100%;
-    }
-
-    body {
-        padding-top: 70px;
-    }
-
-    pagination-controls {
-        margin-left: 140px;
-    }
+  }
 }
 
+pagination-controls {
+  margin-right: 90px;
+
+  @media (max-width: 750px) {
+    margin-left: 140px;
+  }
+}
