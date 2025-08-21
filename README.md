@@ -6,9 +6,9 @@ La aplicación Client Bank en Angular 19, se puede ejecutarse en **modo desarrol
 
 Antes de ejecutar, asegúrate de tener instalados los siguientes programas:
 
-- **Node.js** (v18+ recomendado)
-- **Angular CLI** (v19)
-- **Docker** y **Docker Compose** (para la opción de producción)
+- **Node.js** (v18+ recomendado).
+- **Angular CLI** (v19).
+- **Docker** y **Docker Compose** (para la opción de producción).
 
 ---
 
